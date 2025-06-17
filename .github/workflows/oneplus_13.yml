@@ -18,12 +18,17 @@ on:
       enable_feature_y:
        description: "是否启用lz4kd"
        required: false
-       default: false
+       default: true
        type: boolean
       enable_feature_z:
        description: "是否添加风驰驱动"
        required: false
-       default: false
+       default: true
+       type: boolean
+      enable_feature_a:
+       description: "是否添加VFS"
+       required: false
+       default: true
        type: boolean
        
 
@@ -76,7 +81,7 @@ jobs:
       - name: Initialize repo and sync
         run: |
          mkdir kernel_workspace && cd kernel_workspace
-         repo init -u https://github.com/HanKuCha/kernel_manifest.git -b refs/heads/oneplus/sm8750 -m JiuGeFaCai_oneplus_13_v.xml --depth=1
+         repo init -u https://github.com/xiaouex/kernel_manifest.git -b refs/heads/oneplus/sm8750 -m oneplus_sm8750_v.xml --depth=1
          repo --trace sync -c -j$(nproc --all) --no-tags
          rm kernel_platform/common/android/abi_gki_protected_exports_* || echo "No protected exports!"
          rm kernel_platform/msm-kernel/android/abi_gki_protected_exports_* || echo "No protected exports!"
@@ -199,7 +204,22 @@ jobs:
          git add -A
          git commit -m "Add HMBird GKI patch" || true
 
- 
+      - name: Apply New Hooks patches # 应用新的钩子补丁
+        if: ${{inputs.enable_feature_a }}
+        run: |
+          cd kernel_workspace
+          if [ ! -d SukiSU_patch ]; then
+            git clone https://github.com/SukiSU-Ultra/SukiSU_patch.git
+          else
+            echo "SukiSU_patch 目录已存在，跳过克隆。"
+          fi
+          cp ./SukiSU_patch/hooks/syscall_hooks.patch kernel_workspace/kernel_platform/common
+
+          cd kernel_workspace/kernel_platform/common
+          echo "正在打 vfs 补丁..."
+          patch -p1 -F 3 < "syscall_hooks.patch" || { echo "应用 vfs 补丁失败"; exit 1; }
+          echo "vfs 补丁应用完成"
+          
       - name: Apply lz4kd Patches
         if: ${{inputs.enable_feature_y }}
         run: |
