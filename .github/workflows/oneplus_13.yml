@@ -215,7 +215,7 @@ jobs:
           fi
           cp ./SukiSU_patch/hooks/syscall_hooks.patch kernel_platform/common
 
-          cd kernel_workspace/kernel_platform/common
+          cd kernel_platform/common
           echo "正在打 vfs 补丁..."
           patch -p1 -F 3 < "syscall_hooks.patch" || { echo "应用 vfs 补丁失败"; exit 1; }
           echo "vfs 补丁应用完成"
