@@ -213,7 +213,7 @@ jobs:
           else
             echo "SukiSU_patch 目录已存在，跳过克隆。"
           fi
-          cp ./SukiSU_patch/hooks/syscall_hooks.patch kernel_workspace/kernel_platform/common
+          cp ./SukiSU_patch/hooks/syscall_hooks.patch kernel_platform/common
 
           cd kernel_workspace/kernel_platform/common
           echo "正在打 vfs 补丁..."
