@@ -25,12 +25,7 @@ on:
        required: false
        default: true
        type: boolean
-      enable_feature_a:
-       description: "是否添加VFS"
-       required: false
-       default: true
-       type: boolean
-       
+
 
 
 jobs:
@@ -204,22 +199,6 @@ jobs:
          git add -A
          git commit -m "Add HMBird GKI patch" || true
 
-      - name: Apply New Hooks patches # 应用新的钩子补丁
-        if: ${{inputs.enable_feature_a }}
-        run: |
-          cd kernel_workspace
-          if [ ! -d SukiSU_patch ]; then
-            git clone https://github.com/SukiSU-Ultra/SukiSU_patch.git
-          else
-            echo "SukiSU_patch 目录已存在，跳过克隆。"
-          fi
-          cp ./SukiSU_patch/hooks/syscall_hooks.patch kernel_platform/common
-
-          cd kernel_platform/common
-          echo "正在打 vfs 补丁..."
-          patch -p1 -F 3 < "syscall_hooks.patch" || { echo "应用 vfs 补丁失败"; exit 1; }
-          echo "vfs 补丁应用完成"
-          
       - name: Apply lz4kd Patches
         if: ${{inputs.enable_feature_y }}
         run: |
